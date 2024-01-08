@@ -25,7 +25,6 @@ const Notifications = () => {
     link: "",
     description: "",
     date: null,
-    updateDate: null,
   });
 
   const handleChange = (e) => {
@@ -131,22 +130,7 @@ const Notifications = () => {
                     </DemoContainer>
                   </LocalizationProvider>
                 </Grid>
-                <Grid item xs={12} md={5} lg={5}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={["DateTimePicker"]}>
-                      <DateTimePicker
-                        label="Update date"
-                        value={formData.updateDate}
-                        onChange={(date) =>
-                          handleChange({
-                            target: { name: "updateDate", value: date },
-                          })
-                        }
-                      />
-                    </DemoContainer>
-                  </LocalizationProvider>
-                </Grid>
-
+            
                 <Grid item xs={12} md={4} lg={4}>
                   <FormControl fullWidth>
                     <TextField
