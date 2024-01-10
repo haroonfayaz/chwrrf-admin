@@ -1,19 +1,15 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import dayjs from "dayjs";
-import { IconButton, Input } from "@mui/material";
+import { IconButton } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
-import FormHelperText from "@mui/material/FormHelperText";
 import DataTable from "react-data-table-component";
 import { getAllEvents, createEvent, updateEvent } from "../api";
-import PhotoCamera from "@mui/icons-material/PhotoCamera"; // Import the PhotoCamera icon for a visual cue
 
 const Events = () => {
   const [events, setEvents] = useState([]);
@@ -28,11 +24,11 @@ const Events = () => {
 
   const columns = [
     {
-      name: "Name",
-      selector: "name",
+      name: "Title",
+      selector: "title",
       sortable: true,
       justifyContent: "center",
-      cell: (row) => <div> {row.name}</div>,
+      cell: (row) => <div> {row.title}</div>,
     },
 
     {
@@ -119,6 +115,9 @@ const Events = () => {
       console.error("Error fetching events:", error);
     }
   };
+  useEffect(() => {
+    fetchEvents();
+  }, []);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -136,6 +135,7 @@ const Events = () => {
         name: "",
         link: "",
         description: "",
+        photo:null,
       });
     } catch (error) {
       console.error("POST Error:", error);
@@ -207,7 +207,7 @@ const Events = () => {
             {" "}
             <form onSubmit={handleSubmit}>
               <Grid container spacing={3}>
-                <Grid xs={12} md={12} lg={12}>
+                <Grid item xs={12} md={12} lg={12}>
                   <p style={{ margin: "10px", fontSize: "24px" }}>
                     Complete the following details.
                   </p>

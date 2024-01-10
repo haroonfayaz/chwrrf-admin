@@ -1,133 +1,114 @@
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import dayjs from "dayjs";
 import { IconButton } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
-import FormHelperText from "@mui/material/FormHelperText";
 import DataTable from "react-data-table-component";
 
 
 const FuturePlans = () => {
-  const [plan, setPlan] = useState([]);
+  const [plans, setPlan] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     link: "",
     description: "",
   });
-  // const columns = [
-  //   {
-  //     name: "Name",
-  //     selector: "name",
-  //     sortable: true,
-  //     justifyContent: "center",
-  //     cell: (row) => <div> {row.name}</div>,
-  //   },
-  //   {
-  //     name: "Start Time",
-  //     selector: "start_time",
-  //     sortable: true,
-  //     justifyContent: "center",
-  //     cell: (row) => (
-  //       <div>
-  //         {row.start_time ? (
-  //           <div>{dayjs(row.start_time, "HH:mm").format("HH:mm")}</div>
-  //         ) : (
-  //           ""
-  //         )}
-  //       </div>
-  //     ),
-  //   },
+  const columns = [
+    {
+      name: "Title",
+      selector: "title",
+      sortable: true,
+      justifyContent: "center",
+      cell: (row) => <div> {row.title}</div>,
+    },
+    {
+      name: "Description",
+      selector: "description",
+      sortable: true,
+      justifyContent: "center",
+      cell: (row) => <div> {row.description}</div>,
+    },
+    {
+      name: "Link",
+      selector: "link",
+      sortable: true,
+      justifyContent: "center",
+      cell: (row) => <div> {row.link}</div>,
+    },
+ 
 
-  //   {
-  //     name: "End Time",
-  //     selector: "end_time",
-  //     sortable: true,
-  //     justifyContent: "center",
-  //     cell: (row) => (
-  //       <div>
-  //         {row.end_time ? (
-  //           <div>{dayjs(row.end_time, "HH:mm").format("HH:mm")}</div>
-  //         ) : (
-  //           ""
-  //         )}
-  //       </div>
-  //     ),
-  //   },
+    {
+      name: "Action",
+      selector: "action",
+      justifyContent: "center",
+      cell: (row) => (
+        <div>
+          <IconButton
+            color="primary"
+            onClick={() => this.editShift(row)}
+            aria-label="Edit"
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            color="primary"
+            onClick={() => this.handleClickOpen(row.shift_id)}
+            aria-label="delete"
+            size="large"
+          >
+            <DeleteIcon fontSize="inherit" />
+          </IconButton>
+        </div>
+      ),
+    },
+  ];
 
-  //   {
-  //     name: "Action",
-  //     selector: "action",
-  //     justifyContent: "center",
-  //     cell: (row) => (
-  //       <div>
-  //         <IconButton
-  //           color="primary"
-  //           onClick={() => this.editShift(row)}
-  //           aria-label="Edit"
-  //         >
-  //           <EditIcon />
-  //         </IconButton>
-  //         <IconButton
-  //           color="primary"
-  //           onClick={() => this.handleClickOpen(row.shift_id)}
-  //           aria-label="delete"
-  //           size="large"
-  //         >
-  //           <DeleteIcon fontSize="inherit" />
-  //         </IconButton>
-  //       </div>
-  //     ),
-  //   },
-  // ];
-
-  // const customStyles = {
-  //   rows: {
-  //     style: {
-  //       //          minHeight: '70px', // override the row height
-  //       justifyContent: "center",
-  //       textAlign: "center",
-  //     },
-  //   },
-  //   headCells: {
-  //     style: {
-  //       minHeight: "65px",
-  //       justifyContent: "center",
-  //       textAlign: "center",
-  //       backgroundColor: "#5773ff",
-  //       fontSize: "14px",
-  //       color: "white",
-  //       paddingLeft: "16px", // override the cell padding for data cells
-  //       paddingRight: "auto",
-  //       "&:hover div": {
-  //         backgroundColor: "transparent",
-  //         color: "white !important",
-  //       },
-  //       div: {
-  //         color: "white !important",
-  //       },
-  //       span: {
-  //         color: "white !important",
-  //       },
-  //     },
-  //   },
-  //   cells: {
-  //     style: {
-  //       paddingLeft: "2px", // override the cell padding for data cells
-  //       paddingRight: "2px",
-  //       pointer: "cursor",
-  //       justifyContent: "center",
-  //       textAlign: "center",
-  //     },
-  //   },
-  // };
+  const customStyles = {
+    rows: {
+      style: {
+        //          minHeight: '70px', // override the row height
+        justifyContent: "center",
+        textAlign: "center",
+      },
+    },
+    headCells: {
+      style: {
+        minHeight: "65px",
+        justifyContent: "center",
+        textAlign: "center",
+        backgroundColor: "#5773ff",
+        fontSize: "14px",
+        color: "white",
+        paddingLeft: "16px", // override the cell padding for data cells
+        paddingRight: "auto",
+        "&:hover div": {
+          backgroundColor: "transparent",
+          color: "white !important",
+        },
+        div: {
+          color: "white !important",
+        },
+        span: {
+          color: "white !important",
+        },
+      },
+    },
+    cells: {
+      style: {
+        paddingLeft: "2px", // override the cell padding for data cells
+        paddingRight: "2px",
+        pointer: "cursor",
+        justifyContent: "center",
+        textAlign: "center",
+      },
+    },
+  };
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -250,17 +231,17 @@ const FuturePlans = () => {
         </div>
       </React.Fragment>
     )}
-    {/* {!showForm && (
+    {!showForm && (
       <div className="ms-invoice-table table-responsive mt-2">
         <DataTable
           columns={columns}
           customStyles={customStyles}
           pagination
           paginationRowsPerPageOptions={[10, 25, 50, 100, 500, 1000]}
-          data={setEvents}
+          data={plans}
         />
       </div>
-    )} */}
+    )}
   </>  )
 }
 
