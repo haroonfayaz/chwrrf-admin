@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import { IconButton } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
@@ -9,10 +9,12 @@ import Grid from "@mui/material/Grid";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import DataTable from "react-data-table-component";
-import { getAllEvents, createEvent, updateEvent } from "../api";
+import { getAllEvents, createEvent, deleteEvent } from "../api";
 
 const Events = () => {
   const [events, setEvents] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [dId, setDId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -52,13 +54,17 @@ const Events = () => {
       justifyContent: "center",
       cell: (row) => (
         <div>
-          <IconButton color="primary" aria-label="Edit">
+          <IconButton
+            color="primary"
+            aria-label="Edit"
+            onClick={() => handleUpdate(row.id)}
+          >
             <EditIcon />
           </IconButton>
           <IconButton
             color="primary"
             aria-label="delete"
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleOpen(row.id)}
             size="large"
           >
             <DeleteIcon fontSize="inherit" />
@@ -135,39 +141,74 @@ const Events = () => {
         name: "",
         link: "",
         description: "",
-        photo:null,
+        photo: null,
       });
     } catch (error) {
       console.error("POST Error:", error);
     }
   };
   const handleUpdate = async (eventId) => {
+    console.log(eventId);
+    // try {
+    //   const response = await updateEvent(eventId, formData);
+    //   console.log("Update Response:", response);
+
+    //   fetchEvents();
+
+    //   setFormData({
+    //     name: "",
+    //     link: "",
+    //     description: "",
+    //   });
+    // } catch (error) {
+    //   console.error("Update Error:", error);
+    // }
+  };
+
+
+  const handleDelete = async (dId) => {
+
     try {
-      const response = await updateEvent(eventId, formData);
-      console.log("Update Response:", response);
+      await deleteEvent(dId);
 
       fetchEvents();
+      setOpen(false);
 
-      setFormData({
-        name: "",
-        link: "",
-        description: "",
-      });
     } catch (error) {
-      console.error("Update Error:", error);
+      console.error(`Error deleting event with ID ${dId}:`, error);
     }
   };
-
-  const handleDelete = (id) => {
-    console.log(id);
+  const handleOpen = (discountId) => {
+    setOpen(true);
+    setDId(discountId);
+  };
+  const handleClose = () => {
+    setOpen(false);
+    setDId(null);
   };
   const handleButtonClick = () => {
-    // Trigger the file input when the button is clicked
     fileInputRef.current.click();
   };
 
   return (
     <>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete Event?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you really want to proceed?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>No</Button>
+          <Button onClick={() => handleDelete(dId)}>Yes</Button>
+        </DialogActions>
+      </Dialog>
       {!showForm && (
         <React.Fragment>
           <Grid container spacing={3} alignItems="center">

@@ -5,7 +5,9 @@ const instance = axios.create({
   baseURL,
   timeout: 10000,
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
+    'Accept': '*/*',
+
   },
 });
 
@@ -21,7 +23,7 @@ export const getAllEvents = async () => {
 
 export const createEvent = async (eventData) => {
   try {
-    const response = await instance.post("createEvent", eventData);
+    const response = await instance.post("createEvent", JSON.stringify(eventData));
     return response.data;
   } catch (error) {
     console.error("Error creating event:", error);
@@ -38,6 +40,16 @@ export const updateEvent = async (eventId, eventData) => {
     throw error;
   }
 };
+export const deleteEvent = async (eventId) => {
+  try {
+    const response = await instance.delete(`deleteByEventId/${eventId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting event with ID ${eventId}:`, error);
+    throw error;
+  }
+};
+
 
 export const getAllNotifications = async () => {
   try {
@@ -50,7 +62,7 @@ export const getAllNotifications = async () => {
 };
 export const createNotify = async (formData) => {
   try {
-    const response = await instance.post("createNotify", formData);
+    const response = await instance.post("create", formData);
     return response.data;
   } catch (error) {
     console.error("Error creating notification:", error);
@@ -63,6 +75,45 @@ export const updateNotify = async (notifyId, formData) => {
     return response.data;
   } catch (error) {
     console.error("Error updating notification:", error);
+    throw error;
+  }
+};
+export const deleteNotify = async (id) => {
+  try {
+    const response = await instance.delete(`deleteById/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting event with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+export const getAllFuturePlans = async () => {
+  try {
+    const response = await instance.get("getAllPrograms");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching future plans:", error);
+    throw error;
+  }
+};
+
+export const createFuturePlan = async (formData) => {
+  try {
+    const response = await instance.post("createProgram", formData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating future plan:", error);
+    throw error;
+  }
+};
+
+export const deletePlan = async (id) => {
+  try {
+    const response = await instance.delete(`deleteByProgramId/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting event with ID ${id}:`, error);
     throw error;
   }
 };

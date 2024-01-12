@@ -13,16 +13,20 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { createNotify, getAllNotifications } from "../api";
+import { createNotify, deleteNotify, getAllNotifications } from "../api";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,  } from "@mui/material";
 
 const Notifications = () => {
   const [notifications, setNotification] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [dId, setDId] = useState(null);
+
   const [formData, setFormData] = useState({
     name: "",
     link: "",
     description: "",
-    date: null,
+    date: "",
   });
 
   const columns = [
@@ -75,7 +79,7 @@ const Notifications = () => {
           <IconButton
             color="primary"
             aria-label="delete"
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleOpen(row.id)}
             size="large"
           >
             <DeleteIcon fontSize="inherit" />
@@ -127,12 +131,10 @@ const Notifications = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "date" || name === "updateDate") {
-      setFormData({ ...formData, [name]: value ? new Date(value) : null });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
   const fetchNotify = async () => {
     try {
@@ -160,17 +162,51 @@ const Notifications = () => {
         name: "",
         link: "",
         description: "",
-        photo:null,
+        date:"",
       });
     } catch (error) {
       console.error("POST Error:", error);
     }
   };
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     console.log(id);
+    try {
+      await deleteNotify(id);
+
+      fetchNotify();
+      setOpen(false);
+
+    } catch (error) {
+      console.error(`Error deleting event with ID ${dId}:`, error);
+    }
+  };
+  const handleOpen = (discountId) => {
+    setOpen(true);
+    setDId(discountId);
+  };
+  const handleClose = () => {
+    setOpen(false);
+    setDId(null);
   };
   return (
     <>
+    <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete Notification?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you really want to proceed?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>No</Button>
+          <Button onClick={() => handleDelete(dId)}>Yes</Button>
+        </DialogActions>
+      </Dialog>
       {!showForm && (
         <React.Fragment>
           <Grid container spacing={2} alignItems="center">
