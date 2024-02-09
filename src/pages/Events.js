@@ -152,7 +152,6 @@ const Events = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData, "form data");
   
     try {
       let response;
@@ -178,10 +177,8 @@ const Events = () => {
     }
   };
   const handleGetUpdate = async (eventId) => {
-    console.log(eventId);
     try {
       const response = await getEvent(eventId, formData);
-      console.log("Update Response:", response);
       setFormData({
         title: response.title,
         link: response.link,
