@@ -9,8 +9,20 @@ import Grid from "@mui/material/Grid";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import DataTable from "react-data-table-component";
-import { createFuturePlan, deletePlan, getAllFuturePlans } from "../api";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,  } from "@mui/material";
+import {
+  createFuturePlan,
+  deletePlan,
+  getAllFuturePlans,
+  getFuturePlanById,
+  updateFuturePlan,
+} from "../planApi";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
 const FuturePlans = () => {
   const [plans, setPlan] = useState([]);
@@ -19,28 +31,30 @@ const FuturePlans = () => {
   const [dId, setDId] = useState(null);
 
   const [formData, setFormData] = useState({
-    name: "",
+    title: "",
     link: "",
     description: "",
+    photo: null,
   });
+  const [edit, setEdit] = useState(false);
+  const [updateId, setUpdateId] = useState(null);
+
+
   const columns = [
     {
       name: "Title",
-      selector: "title",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.title}</div>,
     },
     {
       name: "Description",
-      selector: "description",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.description}</div>,
     },
     {
       name: "Link",
-      selector: "link",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.link}</div>,
@@ -48,14 +62,13 @@ const FuturePlans = () => {
 
     {
       name: "Action",
-      selector: "action",
       justifyContent: "center",
       cell: (row) => (
         <div>
           <IconButton
             color="primary"
-            onClick={() => this.editShift(row)}
             aria-label="Edit"
+            onClick={() => handleUpdatePlan(row.id)}
           >
             <EditIcon />
           </IconButton>
@@ -124,37 +137,70 @@ const FuturePlans = () => {
   useEffect(() => {
     fetchPlans();
   }, []);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
+  const handleFileChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      photo: e.target.files[0],
+    }));
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData, "formdata");
     try {
-      const response = await createFuturePlan(formData);
+      let response;
 
-      console.log("Create Event Response:", response);
+      if (edit) {
+        formData.id = updateId;
+        response = await updateFuturePlan(updateId, formData);
+      } else {
+        response = await createFuturePlan(formData);
+      }
       getAllFuturePlans();
+
       setFormData({
-        name: "",
+        title: "",
         link: "",
         description: "",
+        photo: null,
       });
+      setEdit(false);
+      setShowForm(false);
     } catch (error) {
       console.error("Error creating event:", error);
     }
   };
   const handleDelete = async (id) => {
-    console.log(id);
     try {
       await deletePlan(id);
 
       fetchPlans();
       setOpen(false);
-
     } catch (error) {
       console.error(`Error deleting event with ID ${dId}:`, error);
+    }
+  };
+  const handleUpdatePlan = async (id) => {
+    try {
+      const response = await getFuturePlanById(id, formData);
+      setFormData({
+        title: response.title,
+        link: response.link,
+        description: response.description,
+        photo: response.photopath,
+      });
+      setShowForm(true);
+      setUpdateId(id);
+      setEdit(true);
+    } catch (error) {
+      console.error("Update Error:", error);
     }
   };
   const handleOpen = (discountId) => {
@@ -168,13 +214,15 @@ const FuturePlans = () => {
 
   return (
     <>
-    <Dialog
+      <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Delete Future Program?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Future Program?"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Do you really want to proceed?
@@ -223,7 +271,7 @@ const FuturePlans = () => {
           <div style={{ display: "flex" }}>
             <form onSubmit={handleSubmit}>
               <Grid container spacing={3}>
-                <Grid xs={12} md={12} lg={12}>
+                <Grid item xs={12} md={12} lg={12}>
                   <p style={{ margin: "10px", fontSize: "24px" }}>
                     Complete the following details.
                   </p>
@@ -232,12 +280,12 @@ const FuturePlans = () => {
                 <Grid item xs={12} md={5} lg={5}>
                   <FormControl fullWidth>
                     <TextField
-                      name="name"
+                      name="title"
                       label="Title"
                       autoComplete="name"
                       type="text"
                       variant="outlined"
-                      value={formData.name}
+                      value={formData.title}
                       onChange={handleChange}
                       aria-describedby="component-error-text"
                     />
@@ -273,9 +321,27 @@ const FuturePlans = () => {
                     />
                   </FormControl>
                 </Grid>
+                <Grid item xs={12} md={3} lg={3}>
+                  <FormControl>
+                    <input
+                      name="photo"
+                      type="file"
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      style={{
+                        fontSize: "14px",
+                        border: "none",
+                        outline: "none",
+                        borderRadius: "10px",
+                        backgroundColor: "#5773FF",
+                        padding: "10px",
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
                 <Grid item xs={12}>
                   <Button type="submit" variant="contained" color="primary">
-                    Submit
+                    {edit ? "Update" : "Submit"}
                   </Button>
                 </Grid>
               </Grid>
