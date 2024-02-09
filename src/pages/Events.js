@@ -1,7 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton } from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
@@ -9,7 +16,13 @@ import Grid from "@mui/material/Grid";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import DataTable from "react-data-table-component";
-import { getAllEvents, createEvent, deleteEvent } from "../api";
+import {
+  getAllEvents,
+  createEvent,
+  deleteEvent,
+  getEvent,
+  updateEvent,
+} from "../eventApi";
 
 const Events = () => {
   const [events, setEvents] = useState([]);
@@ -17,17 +30,17 @@ const Events = () => {
   const [dId, setDId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
+    title: "",
     link: "",
     description: "",
     photo: null,
   });
-  const fileInputRef = useRef(null);
+  const [edit, setEdit] = useState(false);
+  const [updateId, setUpdateId] = useState(null);
 
   const columns = [
     {
       name: "Title",
-      selector: "title",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.title}</div>,
@@ -35,14 +48,12 @@ const Events = () => {
 
     {
       name: "Link",
-      selector: "link",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.link}</div>,
     },
     {
       name: "Description",
-      selector: "description",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.description}</div>,
@@ -50,14 +61,13 @@ const Events = () => {
 
     {
       name: "Action",
-      selector: "id",
       justifyContent: "center",
       cell: (row) => (
         <div>
           <IconButton
             color="primary"
             aria-label="Edit"
-            onClick={() => handleUpdate(row.id)}
+            onClick={() => handleGetUpdate(row.id)}
           >
             <EditIcon />
           </IconButton>
@@ -124,56 +134,74 @@ const Events = () => {
   useEffect(() => {
     fetchEvents();
   }, []);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      photo: e.target.files[0],
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData, "form data");
+  
     try {
-      const response = await createEvent(formData);
-      console.log("POST Response:", response);
+      let response;
+      if (edit) {
+        formData.id = updateId;
+        response = await updateEvent(updateId,formData);
+      } else {
+        response = await createEvent(formData);
+      }
 
       fetchEvents();
 
       setFormData({
-        name: "",
+        title: "",
         link: "",
         description: "",
         photo: null,
       });
+      setShowForm(false);
+      setEdit(false);
     } catch (error) {
       console.error("POST Error:", error);
     }
   };
-  const handleUpdate = async (eventId) => {
+  const handleGetUpdate = async (eventId) => {
     console.log(eventId);
-    // try {
-    //   const response = await updateEvent(eventId, formData);
-    //   console.log("Update Response:", response);
-
-    //   fetchEvents();
-
-    //   setFormData({
-    //     name: "",
-    //     link: "",
-    //     description: "",
-    //   });
-    // } catch (error) {
-    //   console.error("Update Error:", error);
-    // }
+    try {
+      const response = await getEvent(eventId, formData);
+      console.log("Update Response:", response);
+      setFormData({
+        title: response.title,
+        link: response.link,
+        description: response.description,
+        photo: response.photopath,
+      });
+      setShowForm(true);
+      setUpdateId(eventId);
+      setEdit(true)
+    } catch (error) {
+      console.error("Update Error:", error);
+    }
   };
 
-
   const handleDelete = async (dId) => {
-
     try {
       await deleteEvent(dId);
 
       fetchEvents();
       setOpen(false);
-
     } catch (error) {
       console.error(`Error deleting event with ID ${dId}:`, error);
     }
@@ -185,9 +213,6 @@ const Events = () => {
   const handleClose = () => {
     setOpen(false);
     setDId(null);
-  };
-  const handleButtonClick = () => {
-    fileInputRef.current.click();
   };
 
   return (
@@ -258,12 +283,12 @@ const Events = () => {
                   <FormControl fullWidth>
                     <TextField
                       required
-                      name="name"
+                      name="title"
                       label="Title"
                       autoComplete="name"
                       type="text"
                       variant="outlined"
-                      value={formData.name}
+                      value={formData.title}
                       onChange={handleChange}
                       aria-describedby="component-error-text"
                     />
@@ -307,7 +332,7 @@ const Events = () => {
                     <input
                       name="photo"
                       type="file"
-                      onChange={handleChange}
+                      onChange={handleFileChange}
                       accept="image/*"
                       style={{
                         fontSize: "14px",
@@ -322,7 +347,7 @@ const Events = () => {
                 </Grid>
                 <Grid item xs={12} md={12} lg={12}>
                   <Button type="submit" variant="contained" color="primary">
-                    Submit
+                    {edit?"Update":"Submit"}
                   </Button>
                 </Grid>
               </Grid>
