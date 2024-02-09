@@ -13,17 +13,26 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { createNotify, deleteNotify, getAllNotifications } from "../api";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,  } from "@mui/material";
+import { createNotify, deleteNotify, getAllNotifications,getById,updateNotify } from "../api";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
+import dayjs from "dayjs";
 
 const Notifications = () => {
   const [notifications, setNotification] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [open, setOpen] = useState(false);
   const [dId, setDId] = useState(null);
+  const[edit,setEdit]=useState(false);
+  const [updateId,setUpdateId]=useState(null)
 
   const [formData, setFormData] = useState({
-    name: "",
+    title: "",
     link: "",
     description: "",
     date: "",
@@ -32,7 +41,6 @@ const Notifications = () => {
   const columns = [
     {
       name: "Title",
-      selector: "title",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.title}</div>,
@@ -40,28 +48,24 @@ const Notifications = () => {
 
     {
       name: "Link",
-      selector: "link",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.link}</div>,
     },
     {
       name: "Description",
-      selector: "description",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.description}</div>,
     },
     {
       name: "Date",
-      selector: "date",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.date}</div>,
     },
     {
       name: "Updated date",
-      selector: "update_date",
       sortable: true,
       justifyContent: "center",
       cell: (row) => <div> {row.update_date}</div>,
@@ -69,11 +73,12 @@ const Notifications = () => {
 
     {
       name: "Action",
-      selector: "id",
       justifyContent: "center",
       cell: (row) => (
         <div>
-          <IconButton color="primary" aria-label="Edit">
+          <IconButton color="primary" 
+          aria-label="Edit"
+          onClick={()=>handleNotificationUpdate(row.id)}>
             <EditIcon />
           </IconButton>
           <IconButton
@@ -147,37 +152,67 @@ const Notifications = () => {
   useEffect(() => {
     fetchNotify();
   }, []);
- 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData, "form data");
+    const formattedDate = dayjs(formData.date).format("YYYY-MM-DD");
+
+    const formattedFormData = {
+      ...formData,
+      date: formattedDate,
+    };
+
     try {
-      const response = await createNotify(formData);
-      console.log("POST Response:", response);
-
+      let response;
+      if (edit) {
+        formattedFormData.id = updateId;
+        response = await updateNotify(formattedFormData);
+      } else {
+        response = await createNotify(formattedFormData);
+      }
+  
       fetchNotify();
-
+  
       setFormData({
-        name: "",
+        title: "",
         link: "",
         description: "",
-        date:"",
+        date: "",
       });
+      setEdit(false)
+      setShowForm(false);
     } catch (error) {
       console.error("POST Error:", error);
     }
   };
+
+
   const handleDelete = async (id) => {
-    console.log(id);
     try {
       await deleteNotify(id);
 
       fetchNotify();
       setOpen(false);
-
-    } catch (error) {
-      console.error(`Error deleting event with ID ${dId}:`, error);
+    } 
+    catch (error) {
+      console.error(`Error Deleting event with ID ${id}:`, error);
+    }
+  };
+  const handleNotificationUpdate = async (id) => {
+    try{
+      const response = await getById(id);
+      setFormData({
+        title: response.title,
+        link: response.link,
+        description: response.description,
+      });
+      setShowForm(true);
+      setEdit(true);
+      setUpdateId(id);
+      
+    }
+    catch (error) {
+      console.error(`Error fetching event with ID ${id}:`, error);
     }
   };
   const handleOpen = (discountId) => {
@@ -190,13 +225,15 @@ const Notifications = () => {
   };
   return (
     <>
-    <Dialog
+      <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Delete Notification?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {"Delete Notification?"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Do you really want to proceed?
@@ -245,7 +282,7 @@ const Notifications = () => {
           <div style={{ display: "flex" }}>
             <form onSubmit={handleSubmit}>
               <Grid container spacing={3}>
-                <Grid xs={12} md={12} lg={12}>
+                <Grid item xs={12} md={12} lg={12}>
                   <p style={{ margin: "10px", fontSize: "24px" }}>
                     Complete the following details.
                   </p>
@@ -254,12 +291,12 @@ const Notifications = () => {
                 <Grid item xs={12} md={5} lg={5}>
                   <FormControl fullWidth>
                     <TextField
-                      name="name"
+                      name="title"
                       label="Title"
                       autoComplete="name"
                       type="text"
                       variant="outlined"
-                      value={formData.name}
+                      value={formData.title || ''}
                       onChange={handleChange}
                       aria-describedby="component-error-text"
                     />
@@ -294,7 +331,7 @@ const Notifications = () => {
                     </DemoContainer>
                   </LocalizationProvider>
                 </Grid>
-            
+
                 <Grid item xs={12} md={4} lg={4}>
                   <FormControl fullWidth>
                     <TextField
@@ -313,7 +350,7 @@ const Notifications = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Button type="submit" variant="contained" color="primary">
-                    Submit
+                    {edit?"Update":"Submit"}
                   </Button>
                 </Grid>
               </Grid>
@@ -322,16 +359,16 @@ const Notifications = () => {
         </React.Fragment>
       )}
       {!showForm && (
-      <div className="ms-invoice-table table-responsive mt-2">
-        <DataTable
-          columns={columns}
-          customStyles={customStyles}
-          pagination
-          paginationRowsPerPageOptions={[10, 25, 50, 100, 500, 1000]}
-          data={notifications}
-        />
-      </div>
-    )}
+        <div className="ms-invoice-table table-responsive mt-2">
+          <DataTable
+            columns={columns}
+            customStyles={customStyles}
+            pagination
+            paginationRowsPerPageOptions={[10, 25, 50, 100, 500, 1000]}
+            data={notifications}
+          />
+        </div>
+      )}
     </>
   );
 };
