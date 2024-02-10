@@ -13,7 +13,13 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { createNotify, deleteNotify, getAllNotifications,getById,updateNotify } from "../api";
+import {
+  createNotify,
+  deleteNotify,
+  getAllNotifications,
+  getById,
+  updateNotify,
+} from "../api";
 import {
   Dialog,
   DialogActions,
@@ -28,8 +34,8 @@ const Notifications = () => {
   const [showForm, setShowForm] = useState(false);
   const [open, setOpen] = useState(false);
   const [dId, setDId] = useState(null);
-  const[edit,setEdit]=useState(false);
-  const [updateId,setUpdateId]=useState(null)
+  const [edit, setEdit] = useState(false);
+  const [updateId, setUpdateId] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -76,9 +82,11 @@ const Notifications = () => {
       justifyContent: "center",
       cell: (row) => (
         <div>
-          <IconButton color="primary" 
-          aria-label="Edit"
-          onClick={()=>handleNotificationUpdate(row.id)}>
+          <IconButton
+            color="primary"
+            aria-label="Edit"
+            onClick={() => handleNotificationUpdate(row.id)}
+          >
             <EditIcon />
           </IconButton>
           <IconButton
@@ -163,29 +171,27 @@ const Notifications = () => {
     };
 
     try {
-      let response;
       if (edit) {
         formattedFormData.id = updateId;
-        response = await updateNotify(formattedFormData);
+        await updateNotify(formattedFormData);
       } else {
-        response = await createNotify(formattedFormData);
+        await createNotify(formattedFormData);
       }
-  
+
       fetchNotify();
-  
+
       setFormData({
         title: "",
         link: "",
         description: "",
         date: "",
       });
-      setEdit(false)
+      setEdit(false);
       setShowForm(false);
     } catch (error) {
       console.error("POST Error:", error);
     }
   };
-
 
   const handleDelete = async (id) => {
     try {
@@ -193,13 +199,12 @@ const Notifications = () => {
 
       fetchNotify();
       setOpen(false);
-    } 
-    catch (error) {
+    } catch (error) {
       console.error(`Error Deleting event with ID ${id}:`, error);
     }
   };
   const handleNotificationUpdate = async (id) => {
-    try{
+    try {
       const response = await getById(id);
       setFormData({
         title: response.title,
@@ -209,9 +214,7 @@ const Notifications = () => {
       setShowForm(true);
       setEdit(true);
       setUpdateId(id);
-      
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`Error fetching event with ID ${id}:`, error);
     }
   };
@@ -296,7 +299,7 @@ const Notifications = () => {
                       autoComplete="name"
                       type="text"
                       variant="outlined"
-                      value={formData.title || ''}
+                      value={formData.title || ""}
                       onChange={handleChange}
                       aria-describedby="component-error-text"
                     />
@@ -350,7 +353,7 @@ const Notifications = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Button type="submit" variant="contained" color="primary">
-                    {edit?"Update":"Submit"}
+                    {edit ? "Update" : "Submit"}
                   </Button>
                 </Grid>
               </Grid>

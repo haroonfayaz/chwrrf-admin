@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import {
@@ -152,14 +152,13 @@ const Events = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      let response;
       if (edit) {
         formData.id = updateId;
-        response = await updateEvent(updateId,formData);
+        await updateEvent(updateId, formData);
       } else {
-        response = await createEvent(formData);
+        await createEvent(formData);
       }
 
       fetchEvents();
@@ -187,7 +186,7 @@ const Events = () => {
       });
       setShowForm(true);
       setUpdateId(eventId);
-      setEdit(true)
+      setEdit(true);
     } catch (error) {
       console.error("Update Error:", error);
     }
@@ -344,7 +343,7 @@ const Events = () => {
                 </Grid>
                 <Grid item xs={12} md={12} lg={12}>
                   <Button type="submit" variant="contained" color="primary">
-                    {edit?"Update":"Submit"}
+                    {edit ? "Update" : "Submit"}
                   </Button>
                 </Grid>
               </Grid>

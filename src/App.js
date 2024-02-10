@@ -33,7 +33,7 @@ function App() {
             <Router>
               <Layout>
                       <Routes>
-                        <Route path="/events" element={<Events/>} />
+                        <Route path="/" element={<Events/>} />
                         <Route path="/notification" element={<Notifications/>} />
                         <Route path="/plans" element={<FuturePlans/>} />
 

@@ -155,13 +155,12 @@ const FuturePlans = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      let response;
 
       if (edit) {
         formData.id = updateId;
-        response = await updateFuturePlan(updateId, formData);
+        await updateFuturePlan(updateId, formData);
       } else {
-        response = await createFuturePlan(formData);
+        await createFuturePlan(formData);
       }
       getAllFuturePlans();
 
