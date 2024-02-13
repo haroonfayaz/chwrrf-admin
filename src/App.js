@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { createTheme, ThemeProvider } from "@material-ui/core";
 import { purple } from "@material-ui/core/colors";
 import Layout from "./components/Layout";
@@ -29,10 +34,11 @@ function App() {
         <Router>
           <Layout>
             <Routes>
-              <Route path="/" element={<Navigate to="/events" />} />
+              <Route path="/" element={<Events />} />
               <Route path="/events" element={<Events />} />
               <Route path="/notification" element={<Notifications />} />
               <Route path="/plans" element={<FuturePlans />} />
+              <Route path="*" element={<Navigate to="/events" />} />
             </Routes>
           </Layout>
         </Router>
