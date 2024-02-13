@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/chwrrf-admin/static/js/main.9406364c.js",
+    "main.js": "/chwrrf-admin/static/js/main.b8524b8e.js",
     "static/media/logoimage.png": "/chwrrf-admin/static/media/logoimage.ae6f9d3c792e59c4615d.png",
     "index.html": "/chwrrf-admin/index.html",
-    "main.9406364c.js.map": "/chwrrf-admin/static/js/main.9406364c.js.map"
+    "main.b8524b8e.js.map": "/chwrrf-admin/static/js/main.b8524b8e.js.map"
   },
   "entrypoints": [
-    "static/js/main.9406364c.js"
+    "static/js/main.b8524b8e.js"
   ]
 }
