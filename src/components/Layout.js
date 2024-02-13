@@ -7,13 +7,10 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import { format } from "date-fns";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import TipsAndUpdatesIcon from "@mui/icons-material/TipsAndUpdates";
-import { Avatar, Divider } from "@mui/material";
+import { Avatar} from "@mui/material";
 import image from "../Images/logoimage.png";
 
 const drawerWidth = 240;
