@@ -73,7 +73,7 @@ const Layout = ({ children }) => {
       path: "/notification",
     },
     {
-      text: "Future Plans",
+      text: "Future Programs",
       icon: <TipsAndUpdatesIcon color="secondary" />,
       path: "/Plans",
     },
